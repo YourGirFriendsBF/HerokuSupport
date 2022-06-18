@@ -25,7 +25,7 @@ This is a Telegram Bot written in Python for mirroring files on the Internet to 
 - Mirror/Leech/Watch/Clone/Count/Del by reply
 - YT-DLP quality buttons
 - Search on torrents with Torrent Search API or with variable plugins using qBittorrent search engine
-- Docker image support for linux `amd64, arm64, arm/v7, arm/v6, s390x, arm64/v8` (**Note**: Use `anasty17/mltb:arm64` for `arm64/v8` or oracle)
+- Docker image support for linux `amd64, arm64, arm/v7, arm/v6, s390x, arm64/v8` (**Note**: Use `hitesh920/anus:arm64` for `arm64/v8` or oracle)
 - Update bot at startup and with restart command using `UPSTREAM_REPO`
 - Qbittorrent seed until reaching specific ratio or time
 - Rss feed and filter. Based on this repository [rss-chan](https://github.com/hyPnOtICDo0g/rss-chan)
@@ -60,11 +60,9 @@ This is a Telegram Bot written in Python for mirroring files on the Internet to 
 
 # How to deploy?
 
-## Prerequisites
+Deploy guide can be found [here](https://github.com/ghostmirrorlab/deploy-mirror-leech-bot)
 
-- Tutorial Video from A to Z:
-  - Thanks to [Wiszky](https://github.com/vishnoe115)
-<p><a href="https://www.youtube.com/watch?v=gFQWJ4ftt48"> <img src="https://img.shields.io/badge/See%20Video-black?style=for-the-badge&logo=YouTube" width="160""/></a></p>
+## Prerequisites
 
 ### 1. Installing requirements
 
@@ -240,7 +238,7 @@ sudo docker container prune
 sudo docker image prune -a
 ```
 4. Check the number of processing units of your machine with `nproc` cmd and times it by 4, then edit `AsyncIOThreadsCount` in qBittorrent.conf.
-5. Use `anasty17/mltb:arm64` for oracle or arm64/v8.
+5. Use `hitesh920/anus:arm64` for oracle or arm64/v8.
    - Tutorial Video for Deploying on Oracle VPS:
      - Thanks to [Wiszky](https://github.com/vishnoe115)
      - No need to use sudo su, you can also use sudo before each cmd!
