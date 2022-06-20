@@ -21,20 +21,19 @@ PAGE_NO = 1
 
 
 class MirrorStatus:
-    STATUS_UPLOADING = "Uploading...📤"
-    STATUS_DOWNLOADING = "Downloading...📥"
-    STATUS_CLONING = "Cloning...♻️"
-    STATUS_WAITING = "Queued...💤"
-    STATUS_FAILED = "Failed 🚫. Cleaning Download..."
-    STATUS_PAUSE = "Paused...⛔️"
-    STATUS_ARCHIVING = "Archiving...🔐"
-    STATUS_EXTRACTING = "Extracting...📂"
-    STATUS_SPLITTING = "Splitting...✂️"
-    STATUS_CHECKING = "CheckingUp...📝"
-    STATUS_SEEDING = "Seeding...🌧"
+    STATUS_UPLOADING = "Uploading..."
+    STATUS_DOWNLOADING = "Downloading..."
+    STATUS_CLONING = "Cloning..."
+    STATUS_WAITING = "Queued..."
+    STATUS_FAILED = "Failed. Cleaning Download..."
+    STATUS_PAUSE = "Paused..."
+    STATUS_ARCHIVING = "Archiving..."
+    STATUS_EXTRACTING = "Extracting..."
+    STATUS_SPLITTING = "Splitting..."
+    STATUS_CHECKING = "CheckingUp..."
+    STATUS_SEEDING = "Seeding..."
 
 SIZE_UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
-
 
 class setInterval:
     def __init__(self, interval, action):
@@ -106,8 +105,9 @@ def get_progress_bar_string(status):
     p = 0 if total == 0 else round(completed * 100 / total)
     p = min(max(p, 0), 100)
     cFull = p // 8
-    p_str = '■' * cFull
-    p_str += '□' * (12 - cFull)
+    p_str = '█' * cFull
+    max_size = 100 // 8
+    p_str += ' ' * (max_size - cFull)
     p_str = f"[{p_str}]"
     return p_str
 
@@ -130,7 +130,7 @@ def get_readable_message():
                 MirrorStatus.STATUS_SPLITTING,
                 MirrorStatus.STATUS_SEEDING,
             ]:
-                msg += f"\n{get_progress_bar_string(download)} {download.progress()}"
+                msg += f"\n<code>{get_progress_bar_string(download)}</code> {download.progress()}"
                 if download.status() == MirrorStatus.STATUS_CLONING:
                     msg += f"\n<b>Cloned:</b> {get_readable_file_size(download.processed_bytes())} of {download.size()}"
                 elif download.status() == MirrorStatus.STATUS_UPLOADING:
@@ -148,14 +148,24 @@ def get_readable_message():
                            f" | <b>Leechers:</b> {download.torrent_info().num_leechs}"
                 except:
                     pass
-                msg += f"\n<code>/{BotCommands.CancelMirror} {download.gid()}</code>"
+                if download.message.from_user.username:
+                    uname = f'<a href="tg://user?id={download.message.from_user.id}">{download.message.from_user.username}</a>'
+                else:
+                    uname = f'<a href="tg://user?id={download.message.from_user.id}">{download.message.from_user.first_name}</a>'
+                msg += f'\n<b>User:</b> <code>{uname}</code> (<code>{download.message.from_user.id}</code>)'    
+                msg += f"\n<b>To Stop:</b> <code>/{BotCommands.CancelMirror} {download.gid()}</code>"
             elif download.status() == MirrorStatus.STATUS_SEEDING:
                 msg += f"\n<b>Size: </b>{download.size()}"
                 msg += f"\n<b>Speed: </b>{get_readable_file_size(download.torrent_info().upspeed)}/s"
                 msg += f" | <b>Uploaded: </b>{get_readable_file_size(download.torrent_info().uploaded)}"
                 msg += f"\n<b>Ratio: </b>{round(download.torrent_info().ratio, 3)}"
                 msg += f" | <b>Time: </b>{get_readable_time(download.torrent_info().seeding_time)}"
-                msg += f"\n<code>/{BotCommands.CancelMirror} {download.gid()}</code>"
+                if download.message.from_user.username:
+                    uname = f'<a href="tg://user?id={download.message.from_user.id}">{download.message.from_user.username}</a>'
+                else:
+                    uname = f'<a href="tg://user?id={download.message.from_user.id}">{download.message.from_user.first_name}</a>'
+                msg += f'\n<b>User:</b> <code>{uname}</code> (<code>{download.message.from_user.id}</code>)' 
+                msg += f"\n<b>To Stop:</b> <code>/{BotCommands.CancelMirror} {download.gid()}</code>"
             else:
                 msg += f"\n<b>Size: </b>{download.size()}"
             msg += "\n\n"
