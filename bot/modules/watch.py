@@ -284,13 +284,13 @@ def leechWatchZip(update, context):
     _watch(context.bot, update.message, True, True)
 
 watch_handler = CommandHandler(BotCommands.WatchCommand, watch,
-                                filters=CustomFilters.authorized_chat | CustomFilters.authorized_user, run_async=True)
+                                filters=CustomFilters.owner_filter, run_async=True)
 zip_watch_handler = CommandHandler(BotCommands.ZipWatchCommand, watchZip,
-                                    filters=CustomFilters.authorized_chat | CustomFilters.authorized_user, run_async=True)
+                                    filters=CustomFilters.owner_filter, run_async=True)
 leech_watch_handler = CommandHandler(BotCommands.LeechWatchCommand, leechWatch,
-                                filters=CustomFilters.authorized_chat | CustomFilters.authorized_user, run_async=True)
+                                filters=CustomFilters.owner_filter, run_async=True)
 leech_zip_watch_handler = CommandHandler(BotCommands.LeechZipWatchCommand, leechWatchZip,
-                                    filters=CustomFilters.authorized_chat | CustomFilters.authorized_user, run_async=True)
+                                    filters=CustomFilters.owner-filter, run_async=True)
 quality_handler = CallbackQueryHandler(select_format, pattern="qu", run_async=True)
 
 dispatcher.add_handler(watch_handler)
