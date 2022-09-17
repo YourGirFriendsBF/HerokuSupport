@@ -290,7 +290,7 @@ zip_watch_handler = CommandHandler(BotCommands.ZipWatchCommand, watchZip,
 leech_watch_handler = CommandHandler(BotCommands.LeechWatchCommand, leechWatch,
                                 filters=CustomFilters.owner_filter, run_async=True)
 leech_zip_watch_handler = CommandHandler(BotCommands.LeechZipWatchCommand, leechWatchZip,
-                                    filters=CustomFilters.owner-filter, run_async=True)
+                                    filters=CustomFilters.owner_filter, run_async=True)
 quality_handler = CallbackQueryHandler(select_format, pattern="qu", run_async=True)
 
 dispatcher.add_handler(watch_handler)
