@@ -11,7 +11,7 @@ class _BotCommands:
         self.CancelAllCommand = f'cancelall{CMD_INDEX}'
         self.ListCommand = f'list{CMD_INDEX}'
         self.SearchCommand = f'search{CMD_INDEX}'
-        self.StatusCommand = f'status{CMD_INDEX}'
+        self.StatusCommand = f'status'
         self.AuthorizedUsersCommand = f'users{CMD_INDEX}'
         self.AuthorizeCommand = f'authorize'
         self.UnAuthorizeCommand = f'unauthorize'
