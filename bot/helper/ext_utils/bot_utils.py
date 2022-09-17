@@ -3,13 +3,13 @@ from threading import Thread, Event
 from time import time
 from math import ceil
 from html import escape
-from psutil import virtual_memory, cpu_percent, disk_usage
+from psutil import disk_usage, cpu_percent, swap_memory, cpu_count, virtual_memory, net_io_counters, boot_time
 from requests import head as rhead
 from urllib.request import urlopen
 from telegram import InlineKeyboardMarkup
-
+from telegram.ext import CallbackQueryHandler
 from bot.helper.telegram_helper.bot_commands import BotCommands
-from bot import download_dict, download_dict_lock, STATUS_LIMIT, botStartTime, DOWNLOAD_DIR
+from bot import download_dict, download_dict_lock, STATUS_LIMIT, botStartTime, DOWNLOAD_DIR, dispatcher
 from bot.helper.telegram_helper.button_build import ButtonMaker
 
 MAGNET_REGEX = r"magnet:\?xt=urn:btih:[a-zA-Z0-9]*"
@@ -105,15 +105,15 @@ def get_progress_bar_string(status):
     p = 0 if total == 0 else round(completed * 100 / total)
     p = min(max(p, 0), 100)
     cFull = p // 8
-    p_str = '█' * cFull
+    p_str = '▰' * cFull
     max_size = 100 // 8
-    p_str += ' ' * (max_size - cFull)
+    p_str += '▱' * (max_size - cFull)
     p_str = f"[{p_str}]"
     return p_str
 
 def get_readable_message():
     with download_dict_lock:
-        msg = ""
+        msg = f"Powered By <b>Dhruv Mirror Updates</b>"
         if STATUS_LIMIT is not None:
             tasks = len(download_dict)
             global pages
@@ -122,8 +122,8 @@ def get_readable_message():
                 globals()['COUNT'] -= STATUS_LIMIT
                 globals()['PAGE_NO'] -= 1
         for index, download in enumerate(list(download_dict.values())[COUNT:], start=1):
-            msg += f"<b>Name:</b> <code>{escape(str(download.name()))}</code>"
-            msg += f"\n<b>Status:</b> <i>{download.status()}</i>"
+            msg += f"\n\n<b>File Name:</b> <code>{escape(str(download.name()))}</code>"
+            msg += f"\n<b>Current Status:</b> <i>{download.status()}</i>"
             if download.status() not in [
                 MirrorStatus.STATUS_ARCHIVING,
                 MirrorStatus.STATUS_EXTRACTING,
@@ -137,7 +137,8 @@ def get_readable_message():
                     msg += f"\n<b>Uploaded:</b> {get_readable_file_size(download.processed_bytes())} of {download.size()}"
                 else:
                     msg += f"\n<b>Downloaded:</b> {get_readable_file_size(download.processed_bytes())} of {download.size()}"
-                msg += f"\n<b>Speed:</b> {download.speed()} | <b>ETA:</b> {download.eta()}"
+                msg += f"\n<b>Speed:</b> {download.speed()} | <b>Remaining Time:</b> {download.eta()}"
+                msg += f"\n<b>Time Elapsed: </b>{get_readable_time(time() - download.message.date.timestamp())}"
                 try:
                     msg += f"\n<b>Seeders:</b> {download.aria_download().num_seeders}" \
                            f" | <b>Peers:</b> {download.aria_download().connections}"
@@ -148,31 +149,24 @@ def get_readable_message():
                            f" | <b>Leechers:</b> {download.torrent_info().num_leechs}"
                 except:
                     pass
-                if download.message.from_user.username:
-                    uname = f'<a href="tg://user?id={download.message.from_user.id}">{download.message.from_user.username}</a>'
+                if download.message.chat.type != 'private':
+                    try:
+                        chatid = str(download.message.chat.id)[4:]
+                        msg += f'\n<b>Source Link: </b><a href="https://t.me/c/{chatid}/{download.message.message_id}">{download.message.from_user.first_name}</a> | <b>Id :</b> <code>{download.message.from_user.id}</code>'
+                    except:
+                        pass
                 else:
-                    uname = f'<a href="tg://user?id={download.message.from_user.id}">{download.message.from_user.first_name}</a>'
-                msg += f'\n<b>User:</b> <code>{uname}</code> (<code>{download.message.from_user.id}</code>)'    
-                msg += f"\n<b>To Stop:</b> <code>/{BotCommands.CancelMirror} {download.gid()}</code>"
-            elif download.status() == MirrorStatus.STATUS_SEEDING:
-                msg += f"\n<b>Size: </b>{download.size()}"
-                msg += f"\n<b>Speed: </b>{get_readable_file_size(download.torrent_info().upspeed)}/s"
-                msg += f" | <b>Uploaded: </b>{get_readable_file_size(download.torrent_info().uploaded)}"
-                msg += f"\n<b>Ratio: </b>{round(download.torrent_info().ratio, 3)}"
-                msg += f" | <b>Time: </b>{get_readable_time(download.torrent_info().seeding_time)}"
-                if download.message.from_user.username:
-                    uname = f'<a href="tg://user?id={download.message.from_user.id}">{download.message.from_user.username}</a>'
-                else:
-                    uname = f'<a href="tg://user?id={download.message.from_user.id}">{download.message.from_user.first_name}</a>'
-                msg += f'\n<b>User:</b> <code>{uname}</code> (<code>{download.message.from_user.id}</code>)' 
-                msg += f"\n<b>To Stop:</b> <code>/{BotCommands.CancelMirror} {download.gid()}</code>"
-            else:
+                    msg += f'\n<b>User:</b> ️<code>{download.message.from_user.first_name}</code> | <b>Id:</b> <code>{download.message.from_user.id}</code>'
+                msg += f"\n<b>To Cancel: </b><code>/{BotCommands.CancelMirror} {download.gid()}</code>"
                 msg += f"\n<b>Size: </b>{download.size()}"
             msg += "\n\n"
             if STATUS_LIMIT is not None and index == STATUS_LIMIT:
                 break
-        bmsg = f"<b>CPU:</b> {cpu_percent()}% | <b>FREE:</b> {get_readable_file_size(disk_usage(DOWNLOAD_DIR).free)}"
-        bmsg += f"\n<b>RAM:</b> {virtual_memory().percent}% | <b>UPTIME:</b> {get_readable_time(time() - botStartTime)}"
+        if len(msg) == 0:
+            return None, None
+        bmsg = f"\n<b>___________________________________</b>"
+        bmsg += f"\n<b>Disk:</b> <code>{get_readable_file_size(disk_usage(DOWNLOAD_DIR).free)}</code>"
+        bmsg += f"<b> | UPTM:</b> <code>{get_readable_time(time() - botStartTime)}</code>"
         dlspeed_bytes = 0
         upspeed_bytes = 0
         for download in list(download_dict.values()):
