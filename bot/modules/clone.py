@@ -39,14 +39,14 @@ def _clone(message, bot, multi=0):
     is_appdrive = is_appdrive_link(link)
     if is_gdtot:
         try:
-            msg = sendMessage(f"Processing Your Link: \n\n<code>{link}</code>", bot, message)
+            msg = sendMessage(f"</b>Please Wait While I'm Processing Your Link:<b> \n\n\n<code>{link}</code>", bot, message)
             link = gdtot(link)
             deleteMessage(bot, msg)
         except DirectDownloadLinkException as e:
             deleteMessage(bot, msg)
             return sendMessage(str(e), bot, message)
     if is_appdrive:
-        msg = sendMessage(f"Processing Your Link: \n\n<code>{link}</code>", bot, message)
+        msg = sendMessage(f"<b>Please Wait While I'm Processing Your Link:</b> \n\n\n<code>{link}</code>", bot, message)
         try:
             apdict = appdrive(link)
             link = apdict.get('gdrive_link')
@@ -79,7 +79,7 @@ def _clone(message, bot, multi=0):
             sleep(4)
             Thread(target=_clone, args=(nextmsg, bot, multi)).start()
         if files <= 20:
-            msg = sendMessage(f"Almost There I'll share Drive Link Very Soon: \n\n\n<code>{link}</code>", bot, message)
+            msg = sendMessage(f"<b>Almost There I'm Cloning your Link :</b> \n\n\n<code>{link}</code>", bot, message)
             result, button = gd.clone(link)
             deleteMessage(bot, msg)
         else:
