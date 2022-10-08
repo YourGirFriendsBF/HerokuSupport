@@ -12,7 +12,7 @@ class _BotCommands:
         self.ListCommand = f'list{CMD_INDEX}'
         self.SearchCommand = f'search{CMD_INDEX}'
         self.StatusCommand = f'status'
-        self.AuthorizedUsersCommand = f'users{CMD_INDEX}'
+        self.AuthorizedUsersCommand = f'users'
         self.AuthorizeCommand = f'authorize'
         self.UnAuthorizeCommand = f'unauthorize'
         self.AddSudoCommand = f'addsudo'
