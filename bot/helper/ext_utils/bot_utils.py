@@ -113,7 +113,7 @@ def get_progress_bar_string(status):
 
 def get_readable_message():
     with download_dict_lock:
-        msg = f"Powered By <b>Dhruv Mirror Updates</b>"
+        msg = f"<b>Only for You Bish!</b>"
         if STATUS_LIMIT is not None:
             tasks = len(download_dict)
             global pages
