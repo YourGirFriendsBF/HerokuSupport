@@ -39,14 +39,14 @@ def _clone(message, bot, multi=0):
     is_appdrive = is_appdrive_link(link)
     if is_gdtot:
         try:
-            msg = sendMessage(f"Processing: <code>{link}</code>", bot, message)
+            msg = sendMessage(f"Processing Your Link: \n\n<code>{link}</code>", bot, message)
             link = gdtot(link)
             deleteMessage(bot, msg)
         except DirectDownloadLinkException as e:
             deleteMessage(bot, msg)
             return sendMessage(str(e), bot, message)
     if is_appdrive:
-        msg = sendMessage(f"Processing: <code>{link}</code>", bot, message)
+        msg = sendMessage(f"Processing Your Link: \n\n<code>{link}</code>", bot, message)
         try:
             apdict = appdrive(link)
             link = apdict.get('gdrive_link')
@@ -63,7 +63,7 @@ def _clone(message, bot, multi=0):
             LOGGER.info('Checking File/Folder if already in Drive...')
             smsg, button = gd.drive_list(name, True, True)
             if smsg:
-                msg3 = "File/Folder is already available in Drive.\nHere are the search results:"
+                msg3 = "Your File is already available in Drive.\n\nHere are the search results:"
                 return sendMarkup(msg3, bot, message, button)
         if CLONE_LIMIT is not None:
             LOGGER.info('Checking File/Folder Size...')
@@ -102,7 +102,7 @@ def _clone(message, bot, multi=0):
                     update_all_messages()
             except IndexError:
                 pass
-        cc = f'\n\n<b>cc: </b>{tag}'
+        cc = f'\n\n<b>Cloned By : </b>{tag}'
         if button in ["cancelled", ""]:
             sendMessage(f"{tag} {result}", bot, message)
         else:
