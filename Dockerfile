@@ -1,4 +1,4 @@
-FROM hitesh920/anus:heroku
+FROM dhruvmirror/dhruv444:heroku
 
 WORKDIR /usr/src/app
 RUN chmod 777 /usr/src/app
