@@ -26,5 +26,5 @@ def deletefile(update, context):
     reply_message = sendMessage(msg, context.bot, update.message)
     Thread(target=auto_delete_message, args=(context.bot, update.message, reply_message)).start()
 
-delete_handler = CommandHandler(command=BotCommands.DeleteCommand, callback=deletefile, filters=CustomFilters.owner_filter | CustomFilters.sudo_user, run_async=True)
+delete_handler = CommandHandler(command=BotCommands.DeleteCommand, callback=deletefile, filters=CustomFilters.owner_filter | CustomFilters.sudo_user | CustomFilters.authorized_chat | CustomFilters.authorized_user, run_async=True)
 dispatcher.add_handler(delete_handler)
